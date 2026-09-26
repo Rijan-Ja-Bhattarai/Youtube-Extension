@@ -21,6 +21,8 @@ ytm-pivot-bar-item-renderer[aria-label="Shorts"],
 ytd-mini-guide-entry-renderer:has(button[aria-label="Shorts"]),
 ytd-pivot-bar-item-renderer:has(button[aria-label="Shorts"]),
 ytm-pivot-bar-item-renderer:has(button[aria-label="Shorts"]),
+ytd-guide-section-renderer[aria-label="More from YouTube"],
+ytm-guide-section-renderer[aria-label="More from YouTube"],
 [data-youtube-content-filter-hidden] {
   display: none !important;
 }

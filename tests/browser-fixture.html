@@ -10,6 +10,8 @@
   <ytd-guide-entry-renderer id="channel-called-shorts"><a href="https://www.youtube.com/channel/abc">Shorts</a></ytd-guide-entry-renderer>
   <ytd-mini-guide-entry-renderer id="gaming-nav"><a href="https://www.youtube.com/gaming">Gaming</a></ytd-mini-guide-entry-renderer>
   <ytd-guide-entry-renderer id="playables-nav"><a href="https://www.youtube.com/playables">Playables</a></ytd-guide-entry-renderer>
+  <ytd-guide-section-renderer id="more-from-youtube"><h3><yt-formatted-string id="guide-section-title">More from YouTube</yt-formatted-string></h3><ytd-guide-entry-renderer><a href="https://www.youtube.com/premium">Premium</a></ytd-guide-entry-renderer><ytd-guide-entry-renderer><a href="https://www.youtube.com/studio">Studio</a></ytd-guide-entry-renderer></ytd-guide-section-renderer>
+  <ytd-guide-section-renderer id="other-guide-section"><h3><yt-formatted-string id="guide-section-title">Explore</yt-formatted-string></h3><ytd-guide-entry-renderer><a href="https://www.youtube.com/feed/trending">Trending</a></ytd-guide-entry-renderer></ytd-guide-section-renderer>
 
   <ytd-rich-item-renderer id="shorts-card"><a href="https://www.youtube.com/shorts/abc">Short</a></ytd-rich-item-renderer>
   <ytd-rich-item-renderer id="normal-card"><a href="https://www.youtube.com/watch?v=abc">Normal video</a></ytd-rich-item-renderer>
@@ -46,6 +48,10 @@
       responsiveNav.setAttribute("aria-label", "Shorts");
       responsiveNav.innerHTML = "<button>Shorts</button>";
       document.body.append(responsiveNav);
+      const dynamicGuide = document.createElement("ytd-guide-section-renderer");
+      dynamicGuide.id = "dynamic-more-from-youtube";
+      dynamicGuide.innerHTML = '<h3><yt-formatted-string id="guide-section-title">More from YouTube</yt-formatted-string></h3><ytd-guide-entry-renderer><a href="https://www.youtube.com/premium">Premium</a></ytd-guide-entry-renderer>';
+      document.body.append(dynamicGuide);
 
       setTimeout(() => {
         const hidden = (id) => getComputedStyle(document.getElementById(id)).display === "none";
@@ -54,6 +60,9 @@
           compactShortsHiddenBeforeScript: window.compactShortsHiddenBeforeScript,
           responsiveShortsNav: hidden("responsive-shorts-nav"),
           channelCalledShortsVisible: !hidden("channel-called-shorts"),
+          moreFromYouTube: hidden("more-from-youtube"),
+          dynamicMoreFromYouTube: hidden("dynamic-more-from-youtube"),
+          otherGuideSectionVisible: !hidden("other-guide-section"),
           gamingNav: hidden("gaming-nav"),
           playablesNav: hidden("playables-nav"), shortsCard: hidden("shorts-card"),
           playablesCard: hidden("playables-card"), gameCard: hidden("game-card"),

@@ -25,6 +25,7 @@
     "ytd-game-info-renderer", "ytd-game-details-renderer",
     "ytd-game-card-renderer"
   ].join(",");
+  const GUIDE_SECTION = "ytd-guide-section-renderer, ytm-guide-section-renderer";
   const KNOWN = [
     "ytd-reel-shelf-renderer", "ytd-shorts-shelf-renderer",
     "ytd-reel-item-renderer", "ytd-rich-grid-slim-media",
@@ -88,6 +89,14 @@
     return labels.some((label) => label?.trim().toLowerCase() === "shorts");
   }
 
+  function isMoreFromYouTube(section) {
+    const heading = section.querySelector(
+      "#guide-section-title, #section-title, :scope > h2, :scope > h3, " +
+      ":scope > #header h2, :scope > #header h3"
+    );
+    return heading?.textContent.trim().replace(/\s+/g, " ").toLowerCase() === "more from youtube";
+  }
+
   function hideLinkTarget(link, kind) {
     const nav = link.closest(NAV);
     if (nav) {
@@ -143,6 +152,10 @@
 
     for (const nav of root.querySelectorAll(NAV)) {
       if (isShortsNav(nav)) hide(nav);
+    }
+
+    for (const section of root.querySelectorAll(GUIDE_SECTION)) {
+      if (isMoreFromYouTube(section)) hide(section);
     }
 
     for (const shelf of root.querySelectorAll(SHELF)) {

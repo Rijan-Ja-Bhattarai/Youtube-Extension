@@ -1,6 +1,6 @@
 # Remove YouTube Shorts, Gaming & Playables
 
-A Firefox extension that hides YouTube Shorts, YouTube Gaming destinations and game cards, and YouTube Playables. It also sends direct or in-app visits to their dedicated pages back to YouTube Home. Ordinary videos and live streams are not filtered by topic.
+A Firefox extension that hides YouTube Shorts, YouTube Gaming destinations and game cards, YouTube Playables, and the entire “More from YouTube” sidebar section. It also sends direct or in-app visits to Shorts, Gaming, and Playables pages back to YouTube Home. Ordinary videos and live streams are not filtered by topic.
 
 ## Install temporarily in Firefox
 

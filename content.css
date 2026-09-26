@@ -9,6 +9,18 @@ ytd-mini-game-card-renderer,
 ytd-game-card-renderer,
 ytm-reel-shelf-renderer,
 ytm-shorts-lockup-view-model,
+ytd-guide-entry-renderer:has(a[href^="/shorts"]),
+ytd-mini-guide-entry-renderer:has(a[href^="/shorts"]),
+ytd-guide-collapsible-section-entry-renderer:has(a[href^="/shorts"]),
+ytd-pivot-bar-item-renderer:has(a[href^="/shorts"]),
+ytm-pivot-bar-item-renderer:has(a[href^="/shorts"]),
+ytm-guide-entry-renderer:has(a[href^="/shorts"]),
+ytd-mini-guide-entry-renderer[aria-label="Shorts"],
+ytd-pivot-bar-item-renderer[aria-label="Shorts"],
+ytm-pivot-bar-item-renderer[aria-label="Shorts"],
+ytd-mini-guide-entry-renderer:has(button[aria-label="Shorts"]),
+ytd-pivot-bar-item-renderer:has(button[aria-label="Shorts"]),
+ytm-pivot-bar-item-renderer:has(button[aria-label="Shorts"]),
 [data-youtube-content-filter-hidden] {
   display: none !important;
 }

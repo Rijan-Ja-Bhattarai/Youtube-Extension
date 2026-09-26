@@ -6,6 +6,8 @@
 </head>
 <body>
   <ytd-guide-entry-renderer id="shorts-nav"><a href="https://www.youtube.com/shorts">Shorts</a></ytd-guide-entry-renderer>
+  <ytd-mini-guide-entry-renderer id="compact-shorts-nav" aria-label="Shorts"><button type="button">Shorts</button></ytd-mini-guide-entry-renderer>
+  <ytd-guide-entry-renderer id="channel-called-shorts"><a href="https://www.youtube.com/channel/abc">Shorts</a></ytd-guide-entry-renderer>
   <ytd-mini-guide-entry-renderer id="gaming-nav"><a href="https://www.youtube.com/gaming">Gaming</a></ytd-mini-guide-entry-renderer>
   <ytd-guide-entry-renderer id="playables-nav"><a href="https://www.youtube.com/playables">Playables</a></ytd-guide-entry-renderer>
 
@@ -26,6 +28,10 @@
   <ytd-rich-shelf-renderer id="mixed-shelf"><div id="header"><h2>Recommended</h2></div><ytd-rich-item-renderer id="mixed-short"><a href="https://www.youtube.com/shorts/mixed">Short</a></ytd-rich-item-renderer><ytd-rich-item-renderer id="mixed-video"><a href="https://www.youtube.com/watch?v=mixed">Video</a></ytd-rich-item-renderer></ytd-rich-shelf-renderer>
 
   <output id="result"></output>
+  <script>
+    window.compactShortsHiddenBeforeScript =
+      getComputedStyle(document.getElementById("compact-shorts-nav")).display === "none";
+  </script>
   <script src="../rules.js"></script>
   <script src="../content.js"></script>
   <script>
@@ -35,11 +41,20 @@
       dynamic.id = "dynamic-short";
       dynamic.innerHTML = '<a href="https://www.youtube.com/shorts/new">New Short</a>';
       document.body.append(dynamic);
+      const responsiveNav = document.createElement("ytd-mini-guide-entry-renderer");
+      responsiveNav.id = "responsive-shorts-nav";
+      responsiveNav.setAttribute("aria-label", "Shorts");
+      responsiveNav.innerHTML = "<button>Shorts</button>";
+      document.body.append(responsiveNav);
 
       setTimeout(() => {
         const hidden = (id) => getComputedStyle(document.getElementById(id)).display === "none";
         const checks = {
-          shortsNav: hidden("shorts-nav"), gamingNav: hidden("gaming-nav"),
+          shortsNav: hidden("shorts-nav"), compactShortsNav: hidden("compact-shorts-nav"),
+          compactShortsHiddenBeforeScript: window.compactShortsHiddenBeforeScript,
+          responsiveShortsNav: hidden("responsive-shorts-nav"),
+          channelCalledShortsVisible: !hidden("channel-called-shorts"),
+          gamingNav: hidden("gaming-nav"),
           playablesNav: hidden("playables-nav"), shortsCard: hidden("shorts-card"),
           playablesCard: hidden("playables-card"), gameCard: hidden("game-card"),
           gameMetadata: hidden("game-metadata"), shortsSection: hidden("shorts-section"),

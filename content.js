@@ -13,7 +13,7 @@
   const NAV = [
     "ytd-guide-entry-renderer", "ytd-mini-guide-entry-renderer",
     "ytd-guide-collapsible-section-entry-renderer", "ytd-pivot-bar-item-renderer",
-    "ytm-pivot-bar-item-renderer"
+    "ytm-pivot-bar-item-renderer", "ytm-guide-entry-renderer"
   ].join(",");
   const SHELF = [
     "ytd-rich-shelf-renderer", "ytd-shelf-renderer",
@@ -70,6 +70,24 @@
     );
   }
 
+  function isShortsNav(nav) {
+    const links = Array.from(nav.querySelectorAll("a[href]"));
+    if (links.length) {
+      return links.some((link) => kindForUrl(link.getAttribute("href"), location.href) === "shorts");
+    }
+
+    // The compact navigation can render a button before YouTube attaches its
+    // destination. Only use its label when it has no other link to protect
+    // ordinary navigation entries whose names happen to be "Shorts".
+    const labels = [
+      nav.getAttribute("aria-label"), nav.getAttribute("title"),
+      nav.querySelector("[aria-label], [title]")?.getAttribute("aria-label"),
+      nav.querySelector("[aria-label], [title]")?.getAttribute("title"),
+      nav.textContent
+    ];
+    return labels.some((label) => label?.trim().toLowerCase() === "shorts");
+  }
+
   function hideLinkTarget(link, kind) {
     const nav = link.closest(NAV);
     if (nav) {
@@ -123,6 +141,10 @@
       }
     }
 
+    for (const nav of root.querySelectorAll(NAV)) {
+      if (isShortsNav(nav)) hide(nav);
+    }
+
     for (const shelf of root.querySelectorAll(SHELF)) {
       const heading = headingOf(shelf);
       if (heading === "shorts" || heading === "playables" || heading === "top live games") {
@@ -171,7 +193,7 @@
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ["href", "is-shorts", "is-mini-game-card-shelf"]
+    attributeFilter: ["href", "title", "aria-label", "is-shorts", "is-mini-game-card-shelf"]
   });
   scheduleScan();
 })();

@@ -1,0 +1,3 @@
+tests/.edge-profile*/
+tests/edge-out.txt
+tests/edge-err.txt

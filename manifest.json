@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Remove YouTube Shorts, Gaming & Playables",
+  "version": "1.0.0",
+  "description": "Removes Shorts, YouTube Gaming destinations and game cards, and YouTube Playables from YouTube.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "remove-shorts-gaming-playables@example.org"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://youtube.com/*",
+        "*://www.youtube.com/*",
+        "*://m.youtube.com/*"
+      ],
+      "js": ["rules.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_start"
+    }
+  ]
+}

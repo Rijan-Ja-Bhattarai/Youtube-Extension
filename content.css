@@ -1,0 +1,14 @@
+/* Keep known YouTube components out of view while the page is rendering. */
+ytd-reel-shelf-renderer,
+ytd-shorts-shelf-renderer,
+ytd-reel-item-renderer,
+ytd-rich-grid-slim-media,
+ytd-rich-shelf-renderer[is-shorts],
+ytd-rich-shelf-renderer[is-mini-game-card-shelf],
+ytd-mini-game-card-renderer,
+ytd-game-card-renderer,
+ytm-reel-shelf-renderer,
+ytm-shorts-lockup-view-model,
+[data-youtube-content-filter-hidden] {
+  display: none !important;
+}

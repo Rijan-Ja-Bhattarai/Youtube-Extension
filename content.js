@@ -36,12 +36,12 @@
   ].join(",");
 
   let scanTimer = 0;
-  const hidden = new Set();
+  let fullScanPending = false;
+  const pendingRoots = new Set();
 
   function hide(element) {
-    if (!element || hidden.has(element)) return;
+    if (!element || element.hasAttribute(HIDDEN)) return;
     element.setAttribute(HIDDEN, "");
-    hidden.add(element);
   }
 
   function hideShelf(shelf) {
@@ -129,17 +129,17 @@
     hide(link.closest(CARD) || link);
   }
 
-  function scan() {
-    scanTimer = 0;
-    if (guardLocation()) return;
+  function forEachMatch(root, selector, callback) {
+    if (root.matches(selector)) callback(root);
+    for (const element of root.querySelectorAll(selector)) callback(element);
+  }
 
-    for (const element of hidden) element.removeAttribute(HIDDEN);
-    hidden.clear();
+  function scan(root) {
+    // Only reconsider markers in the changed area. The DOM itself owns them,
+    // so removed YouTube nodes cannot stay alive through an extension Set.
+    forEachMatch(root, `[${HIDDEN}]`, (element) => element.removeAttribute(HIDDEN));
 
-    const root = document.documentElement;
-    if (!root) return;
-
-    for (const element of root.querySelectorAll(KNOWN)) {
+    forEachMatch(root, KNOWN, (element) => {
       const shelf = element.closest(SHELF);
       if (shelf && (element === shelf || element.matches("ytd-reel-item-renderer, ytd-rich-grid-slim-media"))) {
         // A single Shorts card should not erase an unrelated mixed shelf.
@@ -148,31 +148,31 @@
       } else {
         hide(element);
       }
-    }
+    });
 
-    for (const nav of root.querySelectorAll(NAV)) {
+    forEachMatch(root, NAV, (nav) => {
       if (isShortsNav(nav)) hide(nav);
-    }
+    });
 
-    for (const section of root.querySelectorAll(GUIDE_SECTION)) {
+    forEachMatch(root, GUIDE_SECTION, (section) => {
       if (isMoreFromYouTube(section)) hide(section);
-    }
+    });
 
-    for (const shelf of root.querySelectorAll(SHELF)) {
+    forEachMatch(root, SHELF, (shelf) => {
       const heading = headingOf(shelf);
       if (heading === "shorts" || heading === "playables" || heading === "top live games") {
         hideShelf(shelf);
       }
-    }
+    });
 
-    for (const element of root.querySelectorAll(GAME_METADATA)) {
+    forEachMatch(root, GAME_METADATA, (element) => {
       if (isGameMetadata(element)) hide(element);
-    }
+    });
 
-    for (const link of root.querySelectorAll("a[href]")) {
+    forEachMatch(root, "a[href]", (link) => {
       const kind = kindForUrl(link.getAttribute("href"), location.href);
       if (kind) hideLinkTarget(link, kind);
-    }
+    });
   }
 
   function guardLocation() {
@@ -182,7 +182,63 @@
   }
 
   function scheduleScan() {
-    if (!scanTimer) scanTimer = setTimeout(scan, 0);
+    if (!scanTimer) scanTimer = setTimeout(flushScans, 16);
+  }
+
+  function scheduleFullScan() {
+    fullScanPending = true;
+    pendingRoots.clear();
+    scheduleScan();
+  }
+
+  function queueRoot(root) {
+    if (!root || fullScanPending) return;
+    pendingRoots.add(root);
+    scheduleScan();
+  }
+
+  function scopeFor(node) {
+    const element = node instanceof Element ? node : node.parentElement;
+    if (!element) return null;
+    // A rich section may be hidden on behalf of its only shelf. Rechecking
+    // that section also handles shelves added or removed within it.
+    return element.closest("ytd-rich-section-renderer") ||
+      element.closest(`${NAV}, ${GUIDE_SECTION}, ${SHELF}, ${CARD}, ${GAME_METADATA}`);
+  }
+
+  function collectMutations(mutations) {
+    for (const mutation of mutations) {
+      const scope = scopeFor(mutation.target);
+      if (scope) queueRoot(scope);
+      else if (mutation.type === "attributes" && mutation.target instanceof Element) {
+        queueRoot(mutation.target);
+      }
+      if (!scope && mutation.type === "childList") {
+        for (const node of mutation.addedNodes) {
+          if (node instanceof Element) queueRoot(node);
+        }
+      }
+    }
+  }
+
+  function flushScans() {
+    scanTimer = 0;
+    if (guardLocation()) {
+      fullScanPending = false;
+      pendingRoots.clear();
+      return;
+    }
+    if (fullScanPending) {
+      fullScanPending = false;
+      pendingRoots.clear();
+      if (document.documentElement) scan(document.documentElement);
+      return;
+    }
+    const roots = Array.from(pendingRoots);
+    pendingRoots.clear();
+    for (const root of roots) {
+      if (root.isConnected) scan(root);
+    }
   }
 
   function blockClick(event) {
@@ -199,14 +255,15 @@
   document.addEventListener("click", blockClick, true);
   document.addEventListener("auxclick", blockClick, true);
   document.addEventListener("yt-navigate-start", guardLocation, true);
-  document.addEventListener("yt-navigate-finish", scheduleScan, true);
+  document.addEventListener("yt-navigate-finish", scheduleFullScan, true);
   window.addEventListener("popstate", guardLocation, true);
 
-  new MutationObserver(scheduleScan).observe(document, {
+  new MutationObserver(collectMutations).observe(document, {
     childList: true,
     subtree: true,
+    characterData: true,
     attributes: true,
     attributeFilter: ["href", "title", "aria-label", "is-shorts", "is-mini-game-card-shelf"]
   });
-  scheduleScan();
+  scheduleFullScan();
 })();
